@@ -49,6 +49,18 @@ bool audio_async::init(int capture_id, int sample_rate) {
         return false;
     }
 
+    // Set up audio callback for SDL3
+    if (!SDL_SetAudioPostmixCallback(m_dev_id_in, 
+        [](void * userdata, const SDL_AudioSpec * spec, float * buffer, int buflen) {
+            audio_async * audio = (audio_async *) userdata;
+            audio->callback((uint8_t *)buffer, buflen * sizeof(float));
+        }, this)) {
+        fprintf(stderr, "%s: couldn't set audio callback: %s!\n", __func__, SDL_GetError());
+        SDL_CloseAudioDevice(m_dev_id_in);
+        m_dev_id_in = 0;
+        return false;
+    }
+
     SDL_AudioSpec obtained_spec;
     if (!SDL_GetAudioDeviceFormat(m_dev_id_in, &obtained_spec, NULL)) {
         fprintf(stderr, "%s: couldn't get audio device format: %s!\n", __func__, SDL_GetError());
