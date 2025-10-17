@@ -27,7 +27,7 @@ bool audio_async::init(int capture_id, int sample_rate) {
         return false;
     }
 
-    SDL_SetHint(SDL_HINT_AUDIO_RESAMPLING_MODE, "medium");
+    // SDL3: Audio resampling hint removed, SDL3 handles this automatically
 
     {
         int nDevices = 0;
@@ -272,7 +272,11 @@ bool sdl_poll_events() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+#ifdef WHISPER_SDL3
+            case SDL_EVENT_QUIT:
+#else
             case SDL_QUIT:
+#endif
                 {
                     return false;
                 }

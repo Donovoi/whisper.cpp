@@ -34,6 +34,10 @@ if (WHISPER_SDL2 OR WHISPER_SDL3)
 
     target_link_libraries(${TARGET} PRIVATE common common-sdl whisper ${SDL2_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+    if (WHISPER_SDL3)
+        target_compile_definitions(${TARGET} PRIVATE WHISPER_SDL3)
+    endif()
+
     if(WIN32)
         # It requires Windows 8.1 or later for PrefetchVirtualMemory
         target_compile_definitions(${TARGET} PRIVATE -D_WIN32_WINNT=0x0602)

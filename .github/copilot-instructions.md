@@ -110,7 +110,8 @@ python3 scripts/bench.py -f samples/jfk.wav          # Comprehensive benchmarks
 
 - See `examples/stream/` for microphone input using SDL2/SDL3
 - Build with `-DWHISPER_SDL3=ON` (recommended) or `-DWHISPER_SDL2=ON` (legacy)
-- SDL3 support added for improved audio API, backwards compatible with SDL2
+- SDL3 provides improved audio APIs and performance
+- For Ubuntu systems before October 2025, SDL3 must be built from source
 
 **Server Deployment:**
 

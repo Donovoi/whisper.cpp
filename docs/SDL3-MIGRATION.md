@@ -1,14 +1,61 @@
 # SDL2 to SDL3 Migration Guide for whisper.cpp
 
-This document outlines the changes required for migrating from SDL2 to SDL3 in whisper.cpp.
+This document outlines the planned migration from SDL2 to SDL3 in whisper.cpp.
+
+## Current Status (October 2025)
+
+**⚠️ SDL3 Support Status: IN DEVELOPMENT**
+
+SDL3 is still in active development and **not yet available in standard package repositories**. The whisper.cpp codebase has been prepared for SDL3 with:
+- ✅ Build system ready for both SDL2 and SDL3
+- ✅ Source code compatibility layer implemented
+- ⚠️ Waiting for SDL3 stable release
+
+**For production use: Continue using SDL2**
 
 ## Overview
 
-whisper.cpp now supports both SDL2 and SDL3 for real-time audio capture in examples like `whisper-stream`, `command`, `talk-llama`, and others. SDL3 is recommended for new projects due to its improved audio API and better cross-platform support.
+whisper.cpp has prepared dual SDL2/SDL3 support for real-time audio capture in examples like `whisper-stream`, `command`, `talk-llama`, and others. When SDL3 becomes stable and widely available, users can seamlessly migrate by changing a single CMake flag.
 
-## Building with SDL3
+## Building with SDL2 (Current Recommendation)
 
 ### Linux (Ubuntu/Debian)
+
+```bash
+# Install SDL2
+sudo apt-get install libsdl2-dev
+
+# Build whisper.cpp with SDL2
+cmake -B build -DWHISPER_SDL2=ON
+cmake --build build -j --config Release
+```
+
+### macOS
+
+```bash
+# Install SDL2 via Homebrew
+brew install sdl2
+
+# Build whisper.cpp with SDL2
+cmake -B build -DWHISPER_SDL2=ON
+cmake --build build -j --config Release
+```
+
+### Windows (MSVC)
+
+```powershell
+# Download SDL2 development libraries from https://github.com/libsdl-org/SDL/releases
+# Extract and set SDL2_DIR environment variable
+
+# Build whisper.cpp with SDL2
+cmake -B build -DWHISPER_SDL2=ON -DSDL2_DIR="C:\path\to\SDL2\cmake"
+cmake --build build --config Release
+```
+
+## Building with SDL3 (Future - When Available)
+
+### Linux (Ubuntu/Debian)
+
 ```bash
 # Install SDL3 (when available in package managers)
 sudo apt-get install libsdl3-dev
@@ -19,8 +66,9 @@ cmake --build build -j --config Release
 ```
 
 ### macOS
+
 ```bash
-# Install SDL3 via Homebrew
+# Install SDL3 via Homebrew (when available)
 brew install sdl3
 
 # Build whisper.cpp with SDL3
@@ -29,6 +77,7 @@ cmake --build build -j --config Release
 ```
 
 ### Windows (MSVC)
+
 ```powershell
 # Download SDL3 development libraries from https://github.com/libsdl-org/SDL/releases
 # Extract and set SDL3_DIR environment variable
