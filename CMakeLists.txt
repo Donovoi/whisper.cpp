@@ -79,7 +79,8 @@ option(WHISPER_BUILD_SERVER   "whisper: build server example" ${WHISPER_STANDALO
 
 # 3rd party libs
 option(WHISPER_CURL "whisper: use libcurl to download model from an URL" OFF)
-option(WHISPER_SDL2 "whisper: support for libSDL2" OFF)
+option(WHISPER_SDL2 "whisper: support for libSDL2 (deprecated, use WHISPER_SDL3)" OFF)
+option(WHISPER_SDL3 "whisper: support for libSDL3" OFF)
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     option(WHISPER_FFMPEG "whisper: support building and linking with ffmpeg libs (avcodec, swresample, ...)" OFF)

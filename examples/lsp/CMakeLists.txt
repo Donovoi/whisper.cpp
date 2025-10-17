@@ -1,4 +1,4 @@
-if (WHISPER_SDL2)
+if (WHISPER_SDL2 OR WHISPER_SDL3)
     # stream
     set(TARGET lsp)
     add_executable(${TARGET} lsp.cpp)

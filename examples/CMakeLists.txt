@@ -14,6 +14,14 @@ if (WHISPER_SDL2)
     message(STATUS "SDL2_LIBRARIES    = ${SDL2_LIBRARIES}")
 endif()
 
+if (WHISPER_SDL3)
+    # SDL3
+    find_package(SDL3 REQUIRED)
+
+    message(STATUS "SDL3_INCLUDE_DIRS = ${SDL3_INCLUDE_DIRS}")
+    message(STATUS "SDL3_LIBRARIES    = ${SDL3_LIBRARIES}")
+endif()
+
 # common
 
 set(TARGET common)
@@ -66,7 +74,7 @@ target_link_libraries(${TARGET} PRIVATE whisper ${COMMON_EXTRA_LIBS} ${CMAKE_DL_
 set_target_properties(${TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(${TARGET} PROPERTIES FOLDER "libs")
 
-if (WHISPER_SDL2)
+if (WHISPER_SDL2 OR WHISPER_SDL3)
     # common-sdl
 
     set(TARGET common-sdl)
@@ -78,8 +86,14 @@ if (WHISPER_SDL2)
 
     include(DefaultTargetOptions)
 
-    target_include_directories(${TARGET} PUBLIC  ${SDL2_INCLUDE_DIRS})
-    target_link_libraries     (${TARGET} PRIVATE ${SDL2_LIBRARIES})
+    if (WHISPER_SDL3)
+        target_include_directories(${TARGET} PUBLIC  ${SDL3_INCLUDE_DIRS})
+        target_link_libraries     (${TARGET} PRIVATE ${SDL3_LIBRARIES})
+        target_compile_definitions(${TARGET} PRIVATE WHISPER_SDL3)
+    else()
+        target_include_directories(${TARGET} PUBLIC  ${SDL2_INCLUDE_DIRS})
+        target_link_libraries     (${TARGET} PRIVATE ${SDL2_LIBRARIES})
+    endif()
 
     set_target_properties(${TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(${TARGET} PROPERTIES FOLDER "libs")

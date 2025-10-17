@@ -1,7 +1,12 @@
 #pragma once
 
+#ifdef WHISPER_SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
+#else
 #include <SDL.h>
 #include <SDL_audio.h>
+#endif
 
 #include <atomic>
 #include <cstdint>

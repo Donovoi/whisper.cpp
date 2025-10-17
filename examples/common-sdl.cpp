@@ -10,11 +10,60 @@ audio_async::audio_async(int len_ms) {
 
 audio_async::~audio_async() {
     if (m_dev_id_in) {
+#ifdef WHISPER_SDL3
         SDL_CloseAudioDevice(m_dev_id_in);
+#else
+        SDL_CloseAudioDevice(m_dev_id_in);
+#endif
     }
 }
 
 bool audio_async::init(int capture_id, int sample_rate) {
+#ifdef WHISPER_SDL3
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+
+    if (!SDL_Init(SDL_INIT_AUDIO)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_SetHint(SDL_HINT_AUDIO_RESAMPLING_MODE, "medium");
+
+    {
+        int nDevices = 0;
+        SDL_AudioDeviceID * devices = SDL_GetAudioRecordingDevices(&nDevices);
+        fprintf(stderr, "%s: found %d capture devices:\n", __func__, nDevices);
+        for (int i = 0; i < nDevices; i++) {
+            const char * name = SDL_GetAudioDeviceName(devices[i]);
+            fprintf(stderr, "%s:    - Capture device #%d: '%s'\n", __func__, i, name ? name : "Unknown");
+        }
+        SDL_free(devices);
+    }
+
+    SDL_AudioSpec spec = { SDL_AUDIO_F32, 1, sample_rate };
+
+    m_dev_id_in = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_RECORDING, &spec);
+    
+    if (!m_dev_id_in) {
+        fprintf(stderr, "%s: couldn't open an audio device for capture: %s!\n", __func__, SDL_GetError());
+        return false;
+    }
+
+    SDL_AudioSpec obtained_spec;
+    if (!SDL_GetAudioDeviceFormat(m_dev_id_in, &obtained_spec, NULL)) {
+        fprintf(stderr, "%s: couldn't get audio device format: %s!\n", __func__, SDL_GetError());
+        SDL_CloseAudioDevice(m_dev_id_in);
+        m_dev_id_in = 0;
+        return false;
+    }
+
+    fprintf(stderr, "%s: obtained spec for input device:\n", __func__);
+    fprintf(stderr, "%s:     - sample rate:       %d\n", __func__, obtained_spec.freq);
+    fprintf(stderr, "%s:     - format:            %d (required: %d)\n", __func__, obtained_spec.format, SDL_AUDIO_F32);
+    fprintf(stderr, "%s:     - channels:          %d (required: %d)\n", __func__, obtained_spec.channels, 1);
+
+    m_sample_rate = obtained_spec.freq;
+#else
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
@@ -72,6 +121,7 @@ bool audio_async::init(int capture_id, int sample_rate) {
     }
 
     m_sample_rate = capture_spec_obtained.freq;
+#endif
 
     m_audio.resize((m_sample_rate*m_len_ms)/1000);
 
@@ -89,7 +139,11 @@ bool audio_async::resume() {
         return false;
     }
 
+#ifdef WHISPER_SDL3
+    SDL_ResumeAudioDevice(m_dev_id_in);
+#else
     SDL_PauseAudioDevice(m_dev_id_in, 0);
+#endif
 
     m_running = true;
 
@@ -107,7 +161,11 @@ bool audio_async::pause() {
         return false;
     }
 
+#ifdef WHISPER_SDL3
+    SDL_PauseAudioDevice(m_dev_id_in);
+#else
     SDL_PauseAudioDevice(m_dev_id_in, 1);
+#endif
 
     m_running = false;
 
